@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.2.9/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <button id="block-button">Get Current Block Height</button>
+    <div id="block-height"></div>
+
+    <script>
+      const blockButton = document.getElementById('block-button');
+      const blockHeightDiv = document.getElementById('block-height');
+
+      // Wait for the page to load and for the MetaMask extension to be injected
+      window.addEventListener('load', async () => {
+        // Check if the user has the MetaMask extension installed
+        if (typeof ethereum !== 'undefined') {
+          // Set the provider injected by MetaMask as the default provider for web3
+          web3 = new Web3(ethereum);
+          try {
+            // Request the user to enable the extension
+            await ethereum.enable();
+          } catch (error) {
+            // Handle error if the user denies the request or if there is an issue with the extension
+            console.error(error);
+          }
+        } else {
+          console.error('Please install MetaMask to use this page');
+        }
+
+        // Set the default account to use for web3 methods
+        web3.eth.defaultAccount = (await web3.eth.getAccounts())[0];
+
+        // Set the Görli testnet as the provider for web3
+        web3.setProvider(new Web3.providers.HttpProvider('https://goerli.infura.io/v3/YOUR-PROJECT-ID'));
+
+        blockButton.addEventListener('click', async () => {
+          // Get the current block height
+          const blockHeight = await web3.eth.getBlockNumber();
+          // Display the block height in the HTML page
+          blockHeightDiv.innerText = `Current block height: ${blockHeight}`;
+        });
+      });
+    </script>
+  </body>
+</html>
