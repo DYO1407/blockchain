@@ -1,0 +1,68 @@
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.3.1/dist/web3.min.js"></script>
+</head>
+<body>
+  <button id="checkBalance">Check Balance</button>
+  <div id="result"></div>
+
+  <script>
+    // Check if web3 is injected by the browser (in this case, by MetaMask)
+    if (typeof web3 !== 'undefined') {
+      // Use the provider injected by MetaMask
+      var web3js = new Web3(web3.currentProvider);
+
+      // Get the current account selected in MetaMask
+      web3js.eth.getAccounts(function(error, accounts) {
+        if (error) {
+          console.error(error);
+        } else {
+          var currentAccount = accounts[0];
+
+          // Set the address of the ERC20 contract deployed on the Görli testnet
+          var contractAddress = "0x0aA4d105aA587156D127504892f0f4F9a19ef812"; // Replace with the actual contract address
+          // Set the ABI of the ERC20 contract
+          var contractABI = [
+            {
+              "constant": true,
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "address"
+                }
+              ],
+              "name": "balanceOf",
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]; // Replace with the actual contract ABI
+          // Create a contract object using the ABI and the contract address
+          var contract = new web3js.eth.Contract(contractABI, contractAddress);
+
+          // Add an event listener to the "Check Balance" button
+          document.getElementById("checkBalance").addEventListener("click", function() {
+            // Make a contract call to the balanceOf() function, passing the current account as the parameter
+            contract.methods.balanceOf(currentAccount).call(function(error, result) {
+              if (error) {
+                console.error(error);
+              } else {
+                // Display the result in the "result" div
+                document.getElementById("result").innerHTML = "Your balance is: " + result + " tokens";
+              }
+            });
+          });
+        }
+      });
+    } else {
+      console.error("Web3 is not injected by the browser. Make sure you are using a web3-enabled browser (such as MetaMask) and that the provider is properly configured.");
+    }
+  </script>
+</body>
+</html>
